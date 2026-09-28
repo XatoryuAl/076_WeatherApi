@@ -58,4 +58,120 @@ Aplikasi Geologis
 
 <div id="map"></div>
 
+<script>
+    fetch("/api/lokasi")
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
 
+        document.getElementById("lokasi").innerHTML = data.kota;
+        document.getElementById("koordinat").innerHTML = data.koordinat;
+    })
+    .catch(error => {
+        console.error(error);
+    });
+
+    maptilersdk.config.apiKey = "TmW3n2IbOKaZxkghOoYB";
+
+    let longitude = 106.8456;
+    let latitude = -6.2088;
+
+    const map = new maptilersdk.Map({
+
+        container: "map",
+
+        style: maptilersdk.MapStyle.STREETS,
+
+        center: [
+            longitude,
+            latitude
+        ],
+
+        zoom: 11
+    });
+
+    const marker = new maptilersdk.Marker({
+        draggable: true
+    })
+    .setLngLat([
+        longitude,
+        latitude
+    ])
+    .addTo(map);
+
+    function pilihLokasi(lon, lat) {
+
+        marker.setLngLat([
+            lon,
+            lat
+        ]);
+
+        map.flyTo({
+            center: [
+                lon,
+                lat
+            ],
+            zoom: 15
+        });
+
+        document.getElementById("koordinat").innerHTML =
+            `[${lon}, ${lat}]`;
+
+        fetch(
+            `/api/pilih-lokasi?lat=${lat}&lon=${lon}`
+        )
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            console.log(data);
+
+            document.getElementById("lokasi").innerHTML =
+                data.kota;
+
+            document.getElementById("koordinat").innerHTML =
+                data.koordinat;
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+        });
+    }
+
+    map.on("click", function(e) {
+
+        const lon = e.lngLat.lng;
+        const lat = e.lngLat.lat;
+
+        pilihLokasi(lon, lat);
+
+    });
+
+    marker.on("dragend", function() {
+
+        const posisi = marker.getLngLat();
+
+        pilihLokasi(
+            posisi.lng,
+            posisi.lat
+        );
+
+    });
+
+    document
+        .getElementById("btnPilihLokasi")
+        .addEventListener("click", function() {
+
+            alert(
+                "Silakan klik lokasi yang kamu inginkan pada peta."
+            );
+
+        });
+
+</script>
+</body>
+</html>
