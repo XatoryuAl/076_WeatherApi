@@ -34,3 +34,4 @@ app.get('/api/lokasi', async (req, res) => {
     }
 });
 
+
