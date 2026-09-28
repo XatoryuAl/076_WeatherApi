@@ -34,4 +34,40 @@ app.get('/api/lokasi', async (req, res) => {
     }
 });
 
+app.get('/api/pilih-lokasi', async (req, res) => {
 
+    const { lat, lon } = req.query;
+
+    const apikey = "TmW3n2IbOKaZxkghOoYB";
+
+    const url =
+        `https://api.maptiler.com/geocoding/${lon},${lat}.json?key=${apikey}`;
+
+    try {
+
+        const response = await axios.get(url);
+        const data = response.data;
+
+        const lokasi =
+            data.features[0].matching_text ||
+            data.features[0].place_name;
+
+        res.json({
+            kota: lokasi,
+            koordinat: [lon, lat]
+        });
+
+    } catch (error) {
+
+        console.error(error.message);
+
+        res.status(500).json({
+            message: "Gagal mengambil data lokasi"
+        });
+    }
+});
+
+
+app.listen(PORT, () => {
+    console.log(`Server berjalan di http://localhost:${PORT}`);
+});
